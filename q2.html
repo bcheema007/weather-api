@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz 2</title>
+    <link rel="stylesheet" href="style.css" />
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.min.js"
+      integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="city"></h1>
+      <h3 class="time"></h3>
+      <h3 class="status"></h3>
+      <img id="picture" src="#" alt="" />
+      <span id="degree"></span>
+      <sup
+        ><span class="c activated">&#8451;</span> |
+        <span class="f">&#8457;</span></sup
+      >
+      <p class="humidity_wind"></p>
+    </div>
+
+    <script>
+      let date = new Date();
+      let hours = date.getHours();
+      let amOrPm;
+      if (hours < 12) {
+        amOrPm = "AM";
+      } else {
+        amOrPm = "PM";
+      }
+      let minutes = date.getMinutes();
+      let dayOfWeek;
+      switch (date.getDay()) {
+        case 0:
+          dayOfWeek = "Sunday";
+          break;
+        case 1:
+          dayOfWeek = "Monday";
+          break;
+        case 2:
+          dayOfWeek = "Tuesday";
+          break;
+        case 3:
+          dayOfWeek = "Wednesday";
+          break;
+        case 4:
+          dayOfWeek = "Thursday";
+          break;
+        case 5:
+          dayOfWeek = "Friday";
+          break;
+        case 6:
+          dayOfWeek = "Saturday";
+          break;
+      }
+      let time = `${dayOfWeek} ${hours}:${minutes} ${amOrPm}`;
+
+      function meterToKilometer(windSpeed) {
+        let conversion = Number(windSpeed) * 3.6;
+        return conversion;
+      }
+
+      function meterToMilesPerHour(windSpeed) {
+        let conversion = Number(windSpeed) * 2.237;
+        return conversion.toFixed(1);
+      }
+
+      function celsiusToFahrenheit(C) {
+        let fahrenheit = Number(C) * (9 / 5) + 32;
+        return fahrenheit;
+      }
+
+      function fahrenheitToCelsius(F) {
+        let celsius = (Number(F) - 32) * (5 / 9);
+        return celsius;
+      }
+
+      class Info {
+        constructor() {}
+
+        async getIP() {
+          const ip = await fetch("https://api.ipify.org/?format=json");
+          const res = await ip.json();
+          return res;
+        }
+
+        async getZC(ip) {
+          let url = "http://ip-api.com/json/" + ip.ip;
+          const res = await fetch(`${url}`);
+          const data = await res.json();
+          return data;
+        }
+
+        async weatherInfo(zc) {
+          let url = `https://api.openweathermap.org/data/2.5/weather?zip=${zc}&appid=bf36bff44186b34039eaba560653db9f&units=metric`;
+          const res = await fetch(`${url}`);
+          const data = await res.json();
+          return data;
+        }
+      }
+
+      let IP;
+      let ZC;
+      let information;
+      let coord;
+      let weather;
+      let main;
+      let wind;
+      let name;
+
+      $("document").ready(() => {
+        let info = new Info();
+        info.getIP().then((ip) => {
+          IP = ip;
+          info
+            .getZC(ip)
+            .then((data) => {
+              ZC = data.zip;
+              return data.zip;
+            })
+            .then((zc) => {
+              info.weatherInfo(zc).then((data) => {
+                information = data;
+                coord = data.coord;
+                weather = data.weather;
+                main = data.main;
+                wind = data.wind.speed;
+                name = data.name;
+                let city = $(".city");
+                city.html(`${name}`);
+                let t = $(".time");
+                t.html(`${time}`);
+                let status = $(".status");
+                status.html(`${weather[0].main}`);
+                let img = $("#picture");
+                let newSrc = "/images/" + weather[0].icon + ".png";
+                img.get(0).src = newSrc;
+                let d = $("#degree");
+                let temp = main.temp;
+                let windSpeed = wind;
+                let units = "km/h";
+                function printData() {
+                  d.html(`${Math.round(temp)}`);
+                  let p = $(".humidity_wind");
+                  p.html(
+                    `Humidity: ${main.humidity}% <br> Wind: ${windSpeed} ${units}`
+                  );
+                }
+                printData();
+                //check whether f or c is activated and convert accordingly using functions.
+                let fah = $(".f");
+                let cel = $(".c");
+                fah.on("click", function () {
+                  fah.addClass("activated");
+                  cel.removeClass("activated");
+                  temp = celsiusToFahrenheit(main.temp);
+                  windSpeed = meterToMilesPerHour(wind);
+                  units = "mph";
+                  printData();
+                });
+                cel.on("click", function () {
+                  cel.addClass("activated");
+                  fah.removeClass("activated");
+                  let degreeNum = Number(d.get(0).textContent);
+                  temp = fahrenheitToCelsius(degreeNum);
+                  windSpeed = wind;
+                  units = "km/h";
+                  printData();
+                });
+              });
+            });
+        });
+      });
+    </script>
+  </body>
+</html>

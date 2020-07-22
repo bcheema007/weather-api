@@ -1,0 +1,55 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.container {
+  border: solid gray 1px;
+  border-radius: 5px;
+  width: 400px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.city,
+.time,
+.status {
+  color: rgb(109, 108, 108);
+  margin-left: 10px;
+  line-height: 1.4;
+}
+
+#degree,
+.humidity_wind {
+  font-weight: bold;
+}
+
+/* if fahrenheit or celsius is activated */
+.activated {
+  color: blue;
+}
+
+#degree {
+  font-size: 2rem;
+}
+
+.humidity_wind {
+  text-align: right;
+  margin-right: 30px;
+  margin-top: -120px;
+}
+
+#number {
+  font-size: 2rem;
+}
+
+#picture {
+  /* border: solid red 2px; */
+  margin-left: 10px;
+  display: inline-block;
+}
+
+sup {
+  font-weight: bold;
+}
