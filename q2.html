@@ -139,7 +139,7 @@
                 let status = $(".status");
                 status.html(`${weather[0].main}`);
                 let img = $("#picture");
-                let newSrc = "/images/" + weather[0].icon + ".png";
+                let newSrc = "./images/" + weather[0].icon + ".png";
                 img.get(0).src = newSrc;
                 let d = $("#degree");
                 let temp = main.temp;
